@@ -30,23 +30,47 @@ public class ReviewController {
 	@Autowired
 	ReviewService reviewService;
 
-
-
 	@PostMapping("/create")
 	public ResponseEntity<?> createReview(@Valid @RequestBody ReviewRequest reviewRequest, HttpServletRequest request) {
-		String header = request.getHeader("Authorization");
-
-		if (header == null || !header.startsWith("Bearer ")) {
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization header");
+		try {
+			// --- Precondition: Authorization header must be present and valid ---
+			String header = request.getHeader("Authorization");
+			assert header != null && header.startsWith("Bearer ") : "Precondition failed: Missing or invalid Authorization header";
+	
+			// --- Precondition: Review content must not be null or empty ---
+			assert reviewRequest.getReview() != null && !reviewRequest.getReview().isEmpty()
+				: "Precondition failed: Review content must not be empty";
+	
+			// --- Call service ---
+			boolean saved = reviewService.addReview(reviewRequest.convertToReview(), header);
+	
+			// --- Postcondition: Review must be saved successfully ---
+			assert saved : "Postcondition failed: Review was not saved";
+	
+			return ResponseEntity.ok(
+				GeneralResponse.builder()
+					.message("Review has been created successfully")
+					.success(true)
+					.build()
+			);
+		} catch (AssertionError ae) {
+			// Handles contract violations (pre, post, invariant)
+			return ResponseEntity.badRequest().body(
+				GeneralResponse.builder()
+					.message("Assertion failed: " + ae.getMessage())
+					.success(false)
+					.build()
+			);
+		} catch (Exception e) {
+			// Handles unexpected server errors
+			return ResponseEntity.internalServerError().body(
+				GeneralResponse.builder()
+					.message("Unexpected error: " + e.getMessage())
+					.success(false)
+					.build()
+			);
 		}
-
-		reviewService.addReview(reviewRequest.convertToReview(),header);
-
-		System.err.println(reviewRequest.toString());
-		return ResponseEntity.ok(
-                GeneralResponse.builder()
-                        .message("Review has been created successfully")
-						.success(true)
-						.build());
 	}
+	
+
 }

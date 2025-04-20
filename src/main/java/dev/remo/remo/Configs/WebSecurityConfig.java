@@ -75,7 +75,7 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // Set session policy to stateless
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Allow public access to auth endpoints
+                        .requestMatchers("/api/auth/**","/error").permitAll() // Allow public access to auth endpoints
                         .anyRequest().authenticated())
                 .build();
     }

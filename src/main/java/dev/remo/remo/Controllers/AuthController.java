@@ -42,11 +42,11 @@ public class AuthController {
             // --- Precondition: Email and password must not be null or empty ---
             assert request.getEmail() != null && !request.getEmail().isEmpty() : "Precondition failed: Email must not be null or empty";
             assert request.getPassword() != null && !request.getPassword().isEmpty() : "Precondition failed: Password must not be null or empty";
-    
+
             // --- Invariant: System must not allow duplicate emails ---
             boolean emailExists = userService.checkByEmail(request.getEmail());
             assert emailExists == userService.checkByEmail(request.getEmail()) : "Invariant failed: Email existence check must be consistent";
-    
+
             if (emailExists) {
                 return ResponseEntity.ok(JwtResponse.builder()
                         .success(false)
@@ -55,13 +55,13 @@ public class AuthController {
                         .message("")
                         .build());
             }
-    
+
             // --- Postcondition: After successful registration, the user should exist in the system ---
             boolean registered = userService.registerUser(request.convertToUser());
-    
+
             if (registered) {
                 assert userService.checkByEmail(request.getEmail()) : "Postcondition failed: Registered user should exist in the system";
-    
+
                 return ResponseEntity.ok(JwtResponse.builder()
                         .success(true)
                         .token("")
@@ -69,10 +69,10 @@ public class AuthController {
                         .message("Register Successful")
                         .build());
             }
-    
+
             // --- Postcondition: If registration fails, user should still not exist ---
             assert !userService.checkByEmail(request.getEmail()) : "Postcondition failed: Failed registration should not create user";
-    
+
         } catch (AssertionError ae) {
             // Handle failed assertion and return meaningful error to frontend
             return ResponseEntity.ok().body(JwtResponse.builder()
@@ -90,7 +90,7 @@ public class AuthController {
                     .message("")
                     .build());
         }
-    
+
         // Final fallback (in case assertions and registration both fail silently)
         return ResponseEntity.badRequest().body(JwtResponse.builder()
                 .success(false)
@@ -99,7 +99,61 @@ public class AuthController {
                 .message("")
                 .build());
     }
-    
+
+    //Question 3: Coding Example of Design by Contract
+    /*@PostMapping("/signup")
+    public ResponseEntity<?> register(@Valid @RequestBody SignUpRequest request) {
+        // --- Precondition: Email and password must not be null ---
+        if (request.getEmail() == null || request.getEmail().isEmpty()) {
+            // If the email is null or empty, we throw a ResponseStatusException with a BAD_REQUEST status (400)
+            // to inform the client that this input is invalid.
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Precondition failed: Email must not be null or empty.");
+        }
+        if (request.getPassword() == null || request.getPassword().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Precondition failed: Password must not be null or empty.");
+        }
+
+        // --- Invariant: Email must be unique in the system ---
+        boolean emailExists = userService.checkByEmail(request.getEmail());
+        if (emailExists) {
+            // If the email exists, we throw a ResponseStatusException with a CONFLICT status (409),
+            // indicating that the email is already registered in the system.
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Invariant failed: Email already exists in the system.");
+        }
+
+        // --- Process: Register the user ---
+        boolean registered = userService.registerUser(request.convertToUser());
+
+        // --- Postcondition: After successful registration, the user should exist in the system ---
+        if (registered) {
+            if (!userService.checkByEmail(request.getEmail())) {
+                // If the email does not exist in the system, it means the registration failed.
+                // We throw an INTERNAL_SERVER_ERROR (500) as the postcondition has not been met.
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Postcondition failed: Registered user should exist in system.");
+            }
+
+            return ResponseEntity.ok(JwtResponse.builder()
+                    .success(true)
+                    .token("")
+                    .error("")
+                    .message("Register Successful")
+                    .build());
+        }
+
+        // --- Postcondition: If registration fails, the user should not exist ---
+        if (userService.checkByEmail(request.getEmail())) {
+            // If the email still exists in the system after a failed registration, it means the postcondition has failed,
+            // so we throw an INTERNAL_SERVER_ERROR (500).
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Postcondition failed: Failed registration should not create user.");
+        }
+
+        return ResponseEntity.ok(JwtResponse.builder()
+                .success(false)
+                .token("")
+                .error("Registration Unsuccessful")
+                .message("")
+                .build());
+    }*/
     @PostMapping("/signin")
     public ResponseEntity<?> login(
             @Valid @RequestBody SignInRequest request, HttpServletResponse response) {

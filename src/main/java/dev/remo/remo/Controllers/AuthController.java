@@ -324,6 +324,63 @@ public class AuthController {
                     .build());
 }
 
+        @PostMapping("/signin")
+        public ResponseEntity<?> login(@Valid @RequestBody SignInRequest request, HttpServletResponse response) {
+          // --- Precondition: Email and password must not be null or empty ---
+          if (request.getEmail() == null || request.getEmail().isEmpty()) {
+              throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Precondition failed: Email must not be null or empty.");
+          }
+          if (request.getPassword() == null || request.getPassword().isEmpty()) {
+              throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Precondition failed: Password must not be null or empty.");
+          }
+
+          // --- Invariant: AuthenticationManager must be available ---
+          if (authenticationManager == null) {
+             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Invariant failed: AuthenticationManager is not available.");
+           }
+
+          // --- Process: Authenticate user ---
+            Authentication authentication;
+            try {
+                authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+                } catch (AuthenticationException ex) {
+                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login failed: Invalid credentials.");
+                }
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            // --- Process: Generate access and refresh tokens ---
+            String accessToken = jwtUtils.generateAccessToken(authentication);
+            String refreshToken = jwtUtils.generateRefreshToken(authentication);
+
+            // --- Postcondition: Token must not be null or empty ---
+            if (accessToken == null || accessToken.isEmpty()) {
+               throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Postcondition failed: Access token must not be null or empty.");
+            }
+
+            if (refreshToken == null || refreshToken.isEmpty()) {
+               throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Postcondition failed: Refresh token must not be null or empty.");
+            }
+
+            jwtUtils.setJwtCookie(response, refreshToken);
+
+            // --- Process: Extract user info from authentication ---
+            User user = (User) authentication.getPrincipal();
+
+            // --- Return success response ---
+            return ResponseEntity.ok(
+               JwtResponse.builder()
+                    .token(accessToken)
+                    .email(user.getEmail())
+                    .roles(user.getRole())
+                    .success(true)
+                    .error("")
+                    .message("Login successful")
+                    .build());
+        }
+
+
 
         // Refresh access token using refresh token
         @PostMapping("/refresh")

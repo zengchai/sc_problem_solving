@@ -71,6 +71,63 @@ public class ReviewController {
 			);
 		}
 	}
-	
 
+	// Question 3 Feature 3: Implementation Design By Contract for Add Review Feature
+
+//	@PostMapping("/create")
+//	public ResponseEntity<?> createReview(@Valid @RequestBody ReviewRequest reviewRequest, HttpServletRequest request) {
+//		try {
+//			// === PRECONDITIONS ===
+//			// Preconditions define what must be true before executing the core logic.
+//			// These checks ensure that required input and request headers are valid.
+//			String header = request.getHeader("Authorization");
+//			if (header == null || !header.startsWith("Bearer ")) {
+//				// If the authorization header is missing or malformed, the contract is violated.
+//				throw new ResponseStatusException(
+//						HttpStatus.BAD_REQUEST, "Precondition failed: Missing or invalid Authorization header");
+//			}
+//
+//			if (reviewRequest.getReview() == null || reviewRequest.getReview().trim().isEmpty()) {
+//				// Input review text must not be null or empty
+//				throw new ResponseStatusException(
+//						HttpStatus.BAD_REQUEST, "Precondition failed: Review content must not be empty");
+//			}
+//
+//			// === INVARIANTS ===
+//			// Invariants are conditions that must always hold true during method execution.
+//			// Here, we enforce constraints on the review's length, ensuring consistent business rules.
+//			String reviewText = reviewRequest.getReview().trim();
+//			if (reviewText.length() < 10 || reviewText.length() > 1000) {
+//				throw new ResponseStatusException(
+//						HttpStatus.BAD_REQUEST, "Invariant failed: Review must be between 10 and 1000 characters");
+//			}
+//
+//			// === PROCESS ===
+//			// Core functionality: this is where the actual business logic occurs.
+//			// The controller delegates to the service layer to persist the review.
+//			boolean saved = reviewService.addReview(reviewRequest.convertToReview(), header);
+//
+//			// === POSTCONDITIONS ===
+//			// Postconditions verify that after the method completes, certain conditions must be true.
+//			// In this case, we check that the review was successfully saved.
+//			if (!saved) {
+//				throw new ResponseStatusException(
+//						HttpStatus.INTERNAL_SERVER_ERROR, "Postcondition failed: Review was not saved");
+//			}
+//
+//			// If all checks pass, return a success response
+//			return ResponseEntity.ok(
+//					GeneralResponse.builder()
+//							.message("Review has been created successfully")
+//							.success(true)
+//							.build()
+//			);
+//
+//		} catch (ResponseStatusException ex) {
+//			throw ex;
+//		} catch (Exception e) {
+//			throw new ResponseStatusException(
+//					HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error: " + e.getMessage());
+//		}
+//	}
 }

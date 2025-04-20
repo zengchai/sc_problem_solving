@@ -6,7 +6,7 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-public abstract class GeneralResponse {
+public class GeneralResponse {
     Boolean success;
     String error;
     String message;

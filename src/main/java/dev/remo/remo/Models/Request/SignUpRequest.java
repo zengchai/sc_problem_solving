@@ -19,6 +19,6 @@ public class SignUpRequest {
 
 
     public User convertToUser(){
-        return new User(this.email,this.password,this.roles);
+        return new User("",this.email,this.password,this.roles);
     }
 }

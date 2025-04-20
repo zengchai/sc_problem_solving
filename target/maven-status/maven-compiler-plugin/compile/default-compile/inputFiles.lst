@@ -2,9 +2,10 @@ C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Configs\AppConfig.
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Configs\CorsConfig.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Configs\WebSecurityConfig.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Controllers\AuthController.java
-C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Controllers\TestController.java
+C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Controllers\ReviewController.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Models\Motorcycle\Motorcycle.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Models\Motorcycle\MotorcycleDO.java
+C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Models\Request\ReviewRequest.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Models\Request\SignInRequest.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Models\Request\SignUpRequest.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Models\Response\GeneralResponse.java
@@ -14,9 +15,12 @@ C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Models\Review\Revi
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Models\Users\User.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Models\Users\UserDO.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\RemoApplication.java
+C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Repository\Review\ReviewRepository.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Repository\User\MongoDb\UserMongoDb.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Repository\User\MongoDb\UserRespositoryMongoDb.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Repository\User\UserRepository.java
+C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Service\Review\ReviewService.java
+C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Service\Review\ReviewServiceImpl.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Service\User\UserService.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Service\User\UserServiceImpl.java
 C:\Users\02zec\sc_problem_solving\src\main\java\dev\remo\remo\Utils\AuthEntryPointJwt.java

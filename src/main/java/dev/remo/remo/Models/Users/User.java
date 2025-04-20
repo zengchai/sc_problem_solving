@@ -23,7 +23,8 @@ public class User implements UserDetails {
     private String dob;
     private List<String> role;
 
-    public User(String email, String password, List<String> roles) {
+    public User(String id,String email, String password, List<String> roles) {
+        this.id = id;
         this.email = email;
         this.password = password;
         this.role = roles;

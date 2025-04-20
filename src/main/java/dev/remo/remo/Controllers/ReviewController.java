@@ -6,10 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import dev.remo.remo.Models.Request.ReviewRequest;
 import dev.remo.remo.Models.Response.GeneralResponse;
 import dev.remo.remo.Models.Response.JwtResponse;
 import dev.remo.remo.Models.Review.Review;
@@ -24,31 +26,23 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/review")
 public class ReviewController {
 
-	@Autowired
-	UserService userService;
 
 	@Autowired
 	ReviewService reviewService;
 
-	@Autowired
-	JwtUtils jwtUtils;
+
 
 	@PostMapping("/create")
-	public ResponseEntity<?> createReview(@Valid Review review, HttpServletRequest request) {
+	public ResponseEntity<?> createReview(@Valid @RequestBody ReviewRequest reviewRequest, HttpServletRequest request) {
 		String header = request.getHeader("Authorization");
 
 		if (header == null || !header.startsWith("Bearer ")) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization header");
 		}
 
-		String accessToken = header.substring(7);
-		String email = jwtUtils.getEmailFromAccessToken(accessToken);
+		reviewService.addReview(reviewRequest.convertToReview(),header);
 
-		User user = (User) userService.loadUserByUsername(email);
-
-		review.setUser(user);
-		reviewService.addReview(review);
-
+		System.err.println(reviewRequest.toString());
 		return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .message("Review has been created successfully")

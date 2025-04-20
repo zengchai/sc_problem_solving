@@ -43,10 +43,10 @@ public class ReviewServiceImpl implements ReviewService{
         review.setUser(user);
     
         // Save to database
-        reviewRepository.insert(convertToDO(review));
+        ReviewDO reviewDO = reviewRepository.insert(convertToDO(review));
     
         // --- Postcondition: Review must exist in repository after insert ---
-        boolean reviewExists = reviewRepository.existsById(convertToDO(review).getId());
+        boolean reviewExists = reviewRepository.existsById(reviewDO.getId());
         assert reviewExists : "Postcondition failed: Review must exist after insertion";
     
         return true;

@@ -1,14 +1,5 @@
 package dev.remo.remo.Controllers;
 
-import dev.remo.remo.Models.Request.SignInRequest;
-import dev.remo.remo.Models.Request.SignUpRequest;
-import dev.remo.remo.Models.Response.GeneralResponse;
-import dev.remo.remo.Models.Response.JwtResponse;
-import dev.remo.remo.Models.Users.User;
-import dev.remo.remo.Service.User.UserService;
-import dev.remo.remo.Utils.JwtUtils;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import dev.remo.remo.Models.Request.SignInRequest;
+import dev.remo.remo.Models.Request.SignUpRequest;
+import dev.remo.remo.Models.Response.JwtResponse;
+import dev.remo.remo.Models.Users.User;
+import dev.remo.remo.Service.User.UserService;
+import dev.remo.remo.Utils.JwtUtils;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -35,18 +35,21 @@ public class AuthController {
 
     @Autowired
     JwtUtils jwtUtils;
-    
+
     @PostMapping("/signup")
     public ResponseEntity<?> register(@Valid @RequestBody SignUpRequest request) {
         try {
             // --- Precondition: Email and password must not be null or empty ---
-            assert request.getEmail() != null && !request.getEmail().isEmpty() : "Precondition failed: Email must not be null or empty";
-            assert request.getPassword() != null && !request.getPassword().isEmpty() : "Precondition failed: Password must not be null or empty";
-    
+            assert request.getEmail() != null && !request.getEmail().isEmpty()
+                    : "Precondition failed: Email must not be null or empty";
+            assert request.getPassword() != null && !request.getPassword().isEmpty()
+                    : "Precondition failed: Password must not be null or empty";
+
             // --- Invariant: System must not allow duplicate emails ---
             boolean emailExists = userService.checkByEmail(request.getEmail());
-            assert emailExists == userService.checkByEmail(request.getEmail()) : "Invariant failed: Email existence check must be consistent";
-    
+            assert emailExists == userService.checkByEmail(request.getEmail())
+                    : "Invariant failed: Email existence check must be consistent";
+
             if (emailExists) {
                 return ResponseEntity.ok(JwtResponse.builder()
                         .success(false)
@@ -55,13 +58,15 @@ public class AuthController {
                         .message("")
                         .build());
             }
-    
-            // --- Postcondition: After successful registration, the user should exist in the system ---
+
+            // --- Postcondition: After successful registration, the user should exist in
+            // the system ---
             boolean registered = userService.registerUser(request.convertToUser());
-    
+
             if (registered) {
-                assert userService.checkByEmail(request.getEmail()) : "Postcondition failed: Registered user should exist in the system";
-    
+                assert userService.checkByEmail(request.getEmail())
+                        : "Postcondition failed: Registered user should exist in the system";
+
                 return ResponseEntity.ok(JwtResponse.builder()
                         .success(true)
                         .token("")
@@ -69,10 +74,11 @@ public class AuthController {
                         .message("Register Successful")
                         .build());
             }
-    
+
             // --- Postcondition: If registration fails, user should still not exist ---
-            assert !userService.checkByEmail(request.getEmail()) : "Postcondition failed: Failed registration should not create user";
-    
+            assert !userService.checkByEmail(request.getEmail())
+                    : "Postcondition failed: Failed registration should not create user";
+
         } catch (AssertionError ae) {
             // Handle failed assertion and return meaningful error to frontend
             return ResponseEntity.ok().body(JwtResponse.builder()
@@ -90,7 +96,7 @@ public class AuthController {
                     .message("")
                     .build());
         }
-    
+
         // Final fallback (in case assertions and registration both fail silently)
         return ResponseEntity.badRequest().body(JwtResponse.builder()
                 .success(false)
@@ -99,7 +105,7 @@ public class AuthController {
                 .message("")
                 .build());
     }
-    
+
     @PostMapping("/signin")
     public ResponseEntity<?> login(
             @Valid @RequestBody SignInRequest request, HttpServletResponse response) {
@@ -138,7 +144,7 @@ public class AuthController {
         }
 
         User user = (User) userService.loadUserByUsername(jwtUtils.getEmailFromRefreshToken(refreshToken));
-        
+
         // Generate new tokens
         Authentication authentication = new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
         String newAccessToken = jwtUtils.generateAccessToken(authentication);

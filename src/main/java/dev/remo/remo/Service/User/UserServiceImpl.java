@@ -56,6 +56,6 @@ public class UserServiceImpl implements UserService {
     }
 
     public User convertToUser(UserDO userDO){
-        return new User(userDO.getEmail(),userDO.getPassword(),userDO.getRole());
+        return new User(userDO.getId().toString(),userDO.getEmail(),userDO.getPassword(),userDO.getRole());
     }
 }

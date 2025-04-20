@@ -9,6 +9,9 @@ import dev.remo.remo.Service.User.UserService;
 import dev.remo.remo.Utils.JwtUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+
+// import javax.naming.AuthenticationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +24,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.core.AuthenticationException;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -154,7 +160,65 @@ public class AuthController {
                 .message("")
                 .build());
     }*/
+
     @PostMapping("/signin")
+    public ResponseEntity<?> login(@Valid @RequestBody SignInRequest request, HttpServletResponse response) {
+        // --- Precondition: Email and password must not be null or empty ---
+        if (request.getEmail() == null || request.getEmail().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Precondition failed: Email must not be null or empty.");
+        }
+        if (request.getPassword() == null || request.getPassword().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Precondition failed: Password must not be null or empty.");
+        }
+    
+        // --- Invariant: AuthenticationManager must be available ---
+        if (authenticationManager == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Invariant failed: AuthenticationManager is not available.");
+        }
+    
+        // --- Process: Authenticate user ---
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        } catch (AuthenticationException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login failed: Invalid credentials.");
+        }
+    
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    
+        // --- Process: Generate access and refresh tokens ---
+        String accessToken = jwtUtils.generateAccessToken(authentication);
+        String refreshToken = jwtUtils.generateRefreshToken(authentication);
+    
+        // --- Postcondition: Token must not be null or empty ---
+        if (accessToken == null || accessToken.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Postcondition failed: Access token must not be null or empty.");
+        }
+    
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Postcondition failed: Refresh token must not be null or empty.");
+        }
+    
+        jwtUtils.setJwtCookie(response, refreshToken);
+    
+        // --- Process: Extract user info from authentication ---
+        User user = (User) authentication.getPrincipal();
+    
+        // --- Return success response ---
+        return ResponseEntity.ok(
+                JwtResponse.builder()
+                        .token(accessToken)
+                        .email(user.getEmail())
+                        .roles(user.getRole())
+                        .success(true)
+                        .error("")
+                        .message("Login successful")
+                        .build());
+    }
+    
+        
+    /*@PostMapping("/signin")
     public ResponseEntity<?> login(
             @Valid @RequestBody SignInRequest request, HttpServletResponse response) {
 
@@ -180,7 +244,7 @@ public class AuthController {
                         .error("")
                         .message("")
                         .build());
-    }
+    } */
 
     // Refresh access token using refresh token
     @PostMapping("/refresh")

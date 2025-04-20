@@ -15,11 +15,22 @@ public class ReviewDO {
     private ObjectId id;
 
     @NotBlank
-    private String motorcycleId;
+    private String brand;
+
+    @NotBlank
+    private String model;
 
     @NotBlank
     private String userId;
 
     @NotBlank
     private String review;
+
+    public ReviewDO(@NotBlank String brand, @NotBlank String model, @NotBlank String userId,
+            @NotBlank String review) {
+        this.brand = brand;
+        this.model = model;
+        this.userId = userId;
+        this.review = review;
+    }
 }

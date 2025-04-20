@@ -55,7 +55,7 @@ public class ReviewController {
 			);
 		} catch (AssertionError ae) {
 			// Handles contract violations (pre, post, invariant)
-			return ResponseEntity.badRequest().body(
+			return ResponseEntity.ok().body(
 				GeneralResponse.builder()
 					.message("Assertion failed: " + ae.getMessage())
 					.success(false)

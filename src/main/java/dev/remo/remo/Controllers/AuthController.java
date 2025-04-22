@@ -123,7 +123,7 @@ public class AuthController {
         // .build());
         // }
 
-        // Question 3: Coding Example of Design by Contract
+        // Question 3: Coding Example of Design by Contract for signup
         @PostMapping("/signup")
         public ResponseEntity<?> register(@Valid @RequestBody SignUpRequest request) {
                 // --- Precondition: Email and password must not be null ---
@@ -188,7 +188,7 @@ public class AuthController {
                                 .build());
         }
 
-        @PostMapping("/signin")
+        /*@PostMapping("/signin")
         public ResponseEntity<?> login(@RequestBody SignInRequest request, HttpServletResponse response) {
                 try {
                         // --- Precondition: Email and password must not be null or empty ---
@@ -555,4 +555,4 @@ public class AuthController {
         return ResponseEntity.ok("Logged out successfully");
     }
 }
-}
+
